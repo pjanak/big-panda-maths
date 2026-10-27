@@ -1,0 +1,1056 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Big Panda Maths</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Baloo+2:wght@600;800&display=swap">
+<style>
+/* Layout: one-column phone app, the KS2 sister of Little Panda Maths. Sticky top bar, home grid of eight tiles in two groups, each game one screen: prompt card, working area (sum, column method, bar model, diagram), then a number pad or answer buttons. Single bright look by choice. */
+:root{
+  --sky:#E4F3FF; --paper:#FFFFFF; --paper-warm:#FFF6E2;
+  --ink:#2A2440; --ink-soft:#615A7C; --scrim:rgba(42,36,64,.55);
+  --red:#E5392F; --red-soft:#FFE0DC; --red-deep:#B5241C;
+  --gold:#FFB915; --gold-soft:#FFF0C7; --gold-deep:#D18A00;
+  --jade:#12A582; --jade-soft:#D2F4E9; --jade-deep:#0B7A60;
+  --blue:#2F86EB; --blue-soft:#DAEAFF; --blue-deep:#1C62B8;
+  --plum:#7C4DEB; --plum-soft:#EAE1FF; --plum-deep:#5932B8;
+  --cheek:#FF8FB5; --grid:#C9DCF2;
+  --display:"Baloo 2","Arial Rounded MT Bold","Trebuchet MS",system-ui,sans-serif;
+  --body:"Andika","Comic Sans MS","Trebuchet MS",system-ui,sans-serif;
+  --han:"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%}
+body{
+  background:var(--sky);
+  background-image:linear-gradient(var(--blue-soft) 1px,transparent 1px),linear-gradient(90deg,var(--blue-soft) 1px,transparent 1px);
+  background-size:28px 28px;
+  color:var(--ink); font-family:var(--body); font-size:18px; line-height:1.45;
+  -webkit-tap-highlight-color:transparent;
+}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--sky)}
+button{font:inherit;color:inherit;touch-action:manipulation;cursor:pointer}
+button:focus-visible,summary:focus-visible{outline:4px solid var(--plum);outline-offset:3px}
+.app{
+  max-width:560px; margin:0 auto; min-height:100%;
+  display:flex; flex-direction:column;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+
+/* Top bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;align-items:center;gap:10px;padding-block:10px;background:var(--sky)}
+.brand{flex:1;display:flex;align-items:center;gap:8px;min-width:0;font-family:var(--display);font-weight:800;font-size:20px;line-height:1}
+.brand svg{width:40px;height:40px;flex:none}
+.in-game .brand-name,.timing .brand-name{display:none}
+.icon-btn{width:48px;height:48px;border-radius:50%;border:0;background:var(--paper);box-shadow:0 4px 0 var(--blue-soft);display:grid;place-items:center;flex:none}
+.icon-btn svg{width:26px;height:26px}
+.stars{display:flex;align-items:center;gap:4px;background:var(--gold);color:var(--ink);border-radius:999px;padding:6px 14px 6px 10px;font-family:var(--display);font-weight:800;font-size:22px;line-height:1;box-shadow:0 4px 0 var(--gold-deep);flex:none}
+.stars svg{width:24px;height:24px}
+.stars.bump{animation:bump .5s cubic-bezier(.3,1.8,.5,1)}
+.timer-pill{display:flex;align-items:center;gap:4px;flex:none;background:var(--paper);color:var(--ink);border-radius:999px;padding:6px 11px 6px 8px;font-family:var(--display);font-weight:800;font-size:20px;line-height:1;font-variant-numeric:tabular-nums;box-shadow:0 4px 0 var(--blue-soft)}
+.timer-pill svg{width:22px;height:22px}
+.timer-pill.low{background:var(--red);color:var(--paper);box-shadow:0 4px 0 var(--red-deep);animation:bump 1s ease-in-out infinite}
+
+main{flex:1;padding-block:6px 40px}
+.screen{display:flex;flex-direction:column;gap:16px}
+
+/* Home */
+.hello{display:flex;align-items:center;gap:12px}
+.hello .panda-btn{border:0;background:none;padding:0;width:96px;height:96px;flex:none}
+.hello .panda-btn svg{width:100%;height:100%}
+.panda-btn.wiggle svg{animation:wiggle .6s ease}
+.bubble{position:relative;background:var(--paper);border-radius:22px;padding:12px 16px;font-size:18px;box-shadow:0 5px 0 var(--blue-soft);min-width:0}
+.bubble::before{content:"";position:absolute;left:-10px;top:50%;margin-top:-10px;border:10px solid transparent;border-right-color:var(--paper);border-left:0}
+.bubble b{font-family:var(--display);font-size:21px;display:block;line-height:1.1}
+.levels{display:flex;align-items:center;gap:6px;background:var(--paper);border-radius:22px;padding:6px;box-shadow:0 5px 0 var(--blue-soft)}
+.lv-label{font-family:var(--display);font-weight:800;font-size:17px;line-height:1.1;padding-inline:8px 4px;flex:none}
+.lv{flex:1;min-width:0;border:0;border-radius:16px;padding:6px 4px;background:transparent;color:var(--ink-soft);font-family:var(--display);font-weight:800;font-size:18px;line-height:1.05;display:flex;flex-direction:column;align-items:center}
+.lv i{font-style:normal;font-size:13px;color:var(--gold-deep);letter-spacing:1px}
+.lv[aria-pressed="true"]{color:var(--paper)}
+.lv[aria-pressed="true"] i{color:var(--gold)}
+.lv[data-level="easy"][aria-pressed="true"]{background:var(--jade)}
+.lv[data-level="medium"][aria-pressed="true"]{background:var(--blue)}
+.lv[data-level="hard"][aria-pressed="true"]{background:var(--red)}
+.section-h{margin:4px 0 -4px;font-family:var(--display);font-weight:800;font-size:21px;line-height:1.1}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tile{
+  --c:var(--red);--cs:var(--red-soft);--cd:var(--red-deep);
+  border:0;border-radius:26px;padding:14px 14px 16px;text-align:left;
+  background:var(--cs);box-shadow:0 7px 0 var(--cd);
+  display:flex;flex-direction:column;gap:4px;min-width:0;
+  transition:transform .12s,box-shadow .12s;
+}
+.tile:active{transform:translateY(5px);box-shadow:0 2px 0 var(--cd)}
+.tile.jade{--c:var(--jade);--cs:var(--jade-soft);--cd:var(--jade-deep)}
+.tile.blue{--c:var(--blue);--cs:var(--blue-soft);--cd:var(--blue-deep)}
+.tile.gold{--c:var(--gold-deep);--cs:var(--gold-soft);--cd:var(--gold-deep)}
+.tile.plum{--c:var(--plum);--cs:var(--plum-soft);--cd:var(--plum-deep)}
+.seal{display:inline-flex;align-items:center;justify-content:center;align-self:flex-start;background:var(--c,var(--red));color:var(--paper);font-family:var(--han);font-weight:700;font-size:18px;letter-spacing:.06em;border-radius:12px;padding:3px 10px;line-height:1.35;white-space:nowrap}
+.tile .art{height:50px;display:flex;align-items:center;justify-content:center;margin-block:4px;font-family:var(--display);font-weight:800;font-size:24px;color:var(--cd);font-variant-numeric:tabular-nums;line-height:1;white-space:nowrap;text-align:center}
+.tile h3{margin:0;font-family:var(--display);font-weight:800;font-size:22px;line-height:1.05;text-wrap:balance}
+.tile .py{font-size:14px;color:var(--ink-soft);letter-spacing:.02em}
+.tile p{margin:0;font-size:15px;line-height:1.3;color:var(--ink-soft)}
+.art-bars{display:flex;flex-direction:column;gap:4px;width:96px}
+.art-bars i{display:block;height:12px;border-radius:4px;background:var(--blue)}
+.art-bars i+i{width:60%;background:var(--gold)}
+.art-hund{display:grid;grid-template-columns:repeat(10,5px);gap:1px}
+.art-hund i{width:5px;height:5px;background:var(--grid)}
+.art-hund i.f{background:var(--plum)}
+
+.grown{background:var(--paper);border-radius:20px;padding:4px 16px;font-size:16px;color:var(--ink-soft)}
+.grown summary{font-family:var(--display);font-weight:800;font-size:18px;color:var(--ink);padding-block:10px;cursor:pointer}
+.grown p,.grown li{max-width:62ch}
+.grown ul{padding-left:20px;margin-top:0}
+.grown li{margin-bottom:8px}
+.grown .zh{font-family:var(--han);color:var(--red);font-weight:700}
+.set-group{display:flex;flex-direction:column;gap:8px;padding-bottom:14px}
+.set-group+.set-group{border-top:2px solid var(--sky);padding-top:14px}
+.set-group h4{margin:0;font-family:var(--display);font-weight:800;font-size:18px;color:var(--ink)}
+.set-note{margin:0;font-size:16px}
+.chips{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.chip-btn{border:0;border-radius:999px;padding:9px 16px;background:var(--sky);color:var(--ink);font-family:var(--display);font-weight:800;font-size:17px;line-height:1}
+.chip-btn[aria-pressed="true"]{background:var(--plum);color:var(--paper)}
+.chip-btn.danger{background:var(--red);color:var(--paper)}
+.chip-btn:disabled{opacity:.4;cursor:default}
+
+/* Game */
+.game-head{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.game-head h2{margin:0;font-family:var(--display);font-weight:800;font-size:26px;line-height:1}
+.prompt{display:flex;align-items:center;gap:12px;background:var(--paper);border-radius:24px;padding:10px 14px;box-shadow:0 5px 0 var(--blue-soft)}
+.say-btn{width:50px;height:50px;border-radius:50%;border:0;background:var(--jade);box-shadow:0 4px 0 var(--jade-deep);display:grid;place-items:center;flex:none}
+.say-btn svg{width:28px;height:28px}
+.say-btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--jade-deep)}
+.prompt p{margin:0;font-family:var(--display);font-weight:600;font-size:20px;line-height:1.25;min-width:0;text-wrap:pretty}
+.stage{display:flex;flex-direction:column;align-items:center;gap:12px;min-height:110px}
+.answers{display:grid;gap:12px;grid-template-columns:repeat(var(--cols,1),minmax(0,1fr))}
+.opt{min-height:68px;border:0;border-radius:22px;padding:10px 12px;background:var(--paper);color:var(--ink);box-shadow:0 6px 0 var(--blue-soft);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:800;font-size:24px;line-height:1.15;transition:transform .1s,box-shadow .1s,opacity .2s;min-width:0;font-variant-numeric:tabular-nums}
+.answers.list .opt{justify-content:flex-start;text-align:left;font-size:19px;font-weight:600;padding:10px 18px}
+.opt:active{transform:translateY(4px);box-shadow:0 2px 0 var(--blue-soft)}
+.opt.wrong{animation:shake .4s;opacity:.35}
+.opt.right{background:var(--jade);color:var(--paper);box-shadow:0 6px 0 var(--jade-deep);animation:bump .5s cubic-bezier(.3,1.8,.5,1)}
+.next{grid-column:1/-1;height:76px;border:0;border-radius:24px;background:var(--jade);color:var(--paper);font-family:var(--display);font-weight:800;font-size:30px;box-shadow:0 7px 0 var(--jade-deep);animation:rise .35s ease-out}
+.next:active{transform:translateY(5px);box-shadow:0 2px 0 var(--jade-deep)}
+.fact{margin:0;max-width:360px;text-align:center;background:var(--jade-soft);color:var(--jade-deep);border-radius:18px;padding:10px 16px;font-family:var(--display);font-weight:600;font-size:18px;line-height:1.3;animation:rise .4s ease-out}
+.fact.miss{background:var(--gold-soft);color:var(--ink)}
+.hint{margin:0;max-width:360px;text-align:center;background:var(--gold-soft);border-radius:16px;padding:8px 14px;font-size:17px;animation:rise .3s ease-out}
+.hint-btn{border:0;background:var(--paper);border-radius:999px;padding:7px 16px;font-family:var(--display);font-weight:800;font-size:16px;box-shadow:0 4px 0 var(--blue-soft)}
+.sum{font-family:var(--display);font-weight:800;font-size:44px;line-height:1.1;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;font-variant-numeric:tabular-nums;text-align:center}
+.sum .q{min-width:1.4em;padding:0 10px;border-radius:14px;border:4px dashed var(--ink-soft);background:var(--paper);color:var(--ink-soft)}
+.sum .q.ok{border:4px solid var(--jade);color:var(--jade-deep)}
+.sum .q.miss{border:4px solid var(--gold-deep);color:var(--gold-deep)}
+.word{font-size:19px;line-height:1.4;background:var(--paper);border-radius:18px;padding:12px 16px;max-width:380px;box-shadow:0 5px 0 var(--blue-soft)}
+
+/* Number pad */
+.entry-row{grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:8px}
+.entry{min-width:150px;height:62px;box-sizing:border-box;border-radius:18px;background:var(--paper);border:4px solid var(--blue);font-family:var(--display);font-weight:800;font-size:38px;display:flex;align-items:center;justify-content:center;padding:0 16px;font-variant-numeric:tabular-nums}
+.entry:empty::before{content:"?";color:var(--grid)}
+.entry.wrong{animation:shake .4s;border-color:var(--red)}
+.entry.right{border-color:var(--jade);color:var(--jade-deep)}
+.unit{font-family:var(--display);font-weight:800;font-size:26px;color:var(--ink-soft)}
+.pad{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.key{height:58px;border:0;border-radius:18px;background:var(--paper);box-shadow:0 5px 0 var(--blue-soft);font-family:var(--display);font-weight:800;font-size:28px;line-height:1}
+.key:active{transform:translateY(4px);box-shadow:0 1px 0 var(--blue-soft)}
+.key.ok{background:var(--jade);color:var(--paper);box-shadow:0 5px 0 var(--jade-deep)}
+.key.del{background:var(--gold-soft)}
+.key:disabled{opacity:.4}
+.countdown{width:min(100%,320px);height:12px;border-radius:6px;background:var(--paper);overflow:hidden}
+.countdown i{display:block;height:100%;background:var(--red);border-radius:6px;animation:drain var(--t,6s) linear forwards}
+
+/* Column method */
+.col{display:grid;gap:2px 4px;font-family:var(--display);font-weight:800;font-variant-numeric:tabular-nums;background:var(--paper);border-radius:22px;padding:10px 18px 14px;box-shadow:0 5px 0 var(--blue-soft)}
+.col .c{width:38px;height:46px;display:flex;align-items:center;justify-content:center;font-size:34px;line-height:1;position:relative}
+.col .mark{height:22px;font-size:17px;color:var(--red)}
+.col .op{font-size:30px;color:var(--ink-soft)}
+.col .x{color:var(--ink-soft);text-decoration:line-through;text-decoration-color:var(--red);text-decoration-thickness:3px}
+.col .rule{grid-column:1/-1;height:4px;background:var(--ink);border-radius:2px;margin-block:2px}
+.col .box{border:3px dashed var(--grid);border-radius:10px;box-sizing:border-box}
+.col .box.cur{border:3px solid var(--blue);background:var(--blue-soft)}
+.col .box.done{border:3px solid var(--jade);color:var(--jade-deep)}
+.col .box.wrong{animation:shake .4s;border-color:var(--red)}
+.col .carry{height:22px;font-size:17px;color:var(--blue-deep)}
+
+/* Fractions and diagrams */
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1;font-variant-numeric:tabular-nums}
+.frac span:first-child{border-bottom:3px solid currentColor;padding:0 4px 2px}
+.frac span:last-child{padding-top:2px}
+.fbar{display:flex;width:min(100%,330px);height:56px;border:4px solid var(--ink);border-radius:12px;overflow:hidden;background:var(--paper)}
+.fbar .p{flex:1;border-right:3px solid var(--ink)}
+.fbar .p:last-child{border-right:0}
+.fbar .p.on{background:var(--plum)}
+.fbar.tap .p{cursor:pointer}
+.nl{width:min(100%,340px);height:auto}
+.nl text{font-family:var(--display);font-weight:800;font-size:15px;fill:var(--ink)}
+.hund{width:min(100%,240px);height:auto}
+.shape{width:min(100%,340px);height:auto}
+.shape text{font-family:var(--display);font-weight:800;font-size:15px;fill:var(--ink)}
+.bm{width:min(100%,370px);display:flex;flex-direction:column;gap:8px;background:var(--paper);border-radius:18px;padding:12px 14px;box-shadow:0 5px 0 var(--blue-soft);box-sizing:border-box}
+.bm-row{display:flex;align-items:center;gap:8px}
+.bm-name{width:58px;flex:none;font-family:var(--display);font-weight:800;font-size:16px;line-height:1.1}
+.bm-bar{flex:1;display:flex;gap:0;min-width:0}
+.seg{height:38px;display:flex;align-items:center;justify-content:center;border:3px solid var(--ink);margin-left:-3px;box-sizing:border-box;font-family:var(--display);font-weight:800;font-size:16px;min-width:30px;background:var(--blue-soft)}
+.seg:first-child{margin-left:0;border-radius:8px 0 0 8px}
+.seg:last-child{border-radius:0 8px 8px 0}
+.seg:only-child{border-radius:8px}
+.seg.b{background:var(--gold-soft)}
+.seg.q{background:var(--paper);border-style:dashed;color:var(--red)}
+.seg.d{background:repeating-linear-gradient(45deg,var(--plum-soft) 0 6px,var(--paper) 6px 12px)}
+.bm-total{display:flex;align-items:center;gap:8px}
+.bm-total .brace{flex:1;height:12px;border:3px solid var(--ink-soft);border-top:0;border-radius:0 0 10px 10px;margin-left:66px}
+.bm-total b{font-family:var(--display);font-size:17px;white-space:nowrap}
+.rhyme{margin:0;background:var(--red-soft);border-radius:16px;padding:8px 14px;font-size:17px;text-align:center;animation:rise .4s ease-out}
+.rhyme .zh{font-family:var(--han);font-weight:700;font-size:22px;color:var(--red);letter-spacing:.08em;margin-right:6px}
+
+/* Overlays */
+.cheer{position:fixed;inset:0;z-index:40;background:var(--scrim);display:grid;place-items:center;padding:24px max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px))}
+.cheer-card{background:var(--paper);border-radius:32px;padding:20px 24px 24px;text-align:center;max-width:340px;width:100%;box-shadow:0 10px 0 var(--gold-deep);animation:pop .5s cubic-bezier(.3,1.7,.5,1)}
+.cheer-card svg.panda{width:130px;height:130px;animation:hop 1s ease-in-out infinite}
+.cheer-card h2{margin:4px 0;font-family:var(--display);font-weight:800;font-size:36px;color:var(--red);line-height:1}
+.cheer-card p{margin:0 0 16px;font-size:19px}
+.cheer-card button{width:100%;height:66px;border:0;border-radius:22px;background:var(--gold);box-shadow:0 6px 0 var(--gold-deep);font-family:var(--display);font-weight:800;font-size:25px}
+.cheer-card .hold{position:relative;overflow:hidden;margin-top:12px;height:58px;background:var(--sky);box-shadow:0 5px 0 var(--blue-soft);font-size:17px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.cheer-card .hold::before{content:"";position:absolute;inset:0 auto 0 0;width:0;background:var(--jade-soft)}
+.cheer-card .hold.holding::before{width:100%;transition:width 2s linear}
+.cheer-card .hold span{position:relative}
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
+
+.pk{fill:var(--ink)} .pw{fill:var(--paper)} .pc{fill:var(--cheek);opacity:.75}
+.ps{fill:none;stroke:var(--ink);stroke-width:3.5;stroke-linecap:round}
+.pg{fill:none;stroke:var(--blue-deep);stroke-width:3.5}
+
+@keyframes pop{0%{transform:scale(.2)}100%{transform:scale(1)}}
+@keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}50%{transform:translateX(8px)}75%{transform:translateX(-5px)}}
+@keyframes rise{from{transform:translateY(14px);opacity:.3}to{transform:none;opacity:1}}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-10deg)}75%{transform:rotate(10deg)}}
+@keyframes hop{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes drain{from{width:100%}to{width:0}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.countdown i{width:0}}
+@media (max-width:350px){.tiles{grid-template-columns:1fr}.col .c{width:32px}}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="bar">
+    <button class="icon-btn" id="homeBtn" aria-label="Back to all games" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+    </button>
+    <div class="brand"><span data-panda></span><span class="brand-name">Big Panda Maths</span></div>
+    <div class="timer-pill" id="timerPill" aria-label="Play time left" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 10v3.5l2.5 1.5M9.5 2.5h5"/></svg>
+      <span id="timerText">0:00</span>
+    </div>
+    <div class="stars" id="starBox" aria-label="Stars earned">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path class="pk" d="M12 2.5l2.9 6 6.6.8-4.9 4.6 1.3 6.6L12 17.2l-5.9 3.3 1.3-6.6L2.5 9.3l6.6-.8z"/></svg>
+      <span id="starCount">0</span>
+    </div>
+    <button class="icon-btn" id="soundBtn" aria-label="Turn sound off">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path id="soundWaves" d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/><path id="soundX" d="M17 9l5 6M22 9l-5 6" hidden/></svg>
+    </button>
+  </header>
+
+  <main>
+    <section class="screen" id="home">
+      <div class="hello">
+        <button class="panda-btn" id="pandaBtn" aria-label="Say hello to Bao the panda"><span data-panda></span></button>
+        <div class="bubble"><b>Bao's back, and bigger!</b>Ready for Key Stage 2? These use the same clever methods taught in Shanghai classrooms.</div>
+      </div>
+      <div class="levels" role="group" aria-label="Year group"><span class="lv-label">Year<br>group</span><button class="lv" data-level="easy" aria-pressed="true">Y3–4<i>★</i></button><button class="lv" data-level="medium" aria-pressed="false">Y5<i>★★</i></button><button class="lv" data-level="hard" aria-pressed="false">Y6<i>★★★</i></button></div>
+
+      <h2 class="section-h">Number and calculating</h2>
+      <div class="tiles">
+        <button class="tile" data-game="times">
+          <span class="seal">乘法口诀</span>
+          <span class="art">7 × 8 = 56</span>
+          <h3>Times Tables</h3>
+          <span class="py">chéng fǎ kǒu jué</span>
+          <p>Up to 12 × 12, with a Year 4 check mode</p>
+        </button>
+        <button class="tile blue" data-game="column">
+          <span class="seal">竖式</span>
+          <span class="art">4003<br>−1257</span>
+          <h3>Column Methods</h3>
+          <span class="py">shù shì</span>
+          <p>Add and subtract, column by column</p>
+        </button>
+        <button class="tile jade" data-game="clever">
+          <span class="seal">巧算</span>
+          <span class="art">25 × 4 = 100</span>
+          <h3>Clever Calculating</h3>
+          <span class="py">qiǎo suàn</span>
+          <p>Shortcuts like +99 and ×25</p>
+        </button>
+        <button class="tile gold" data-game="place">
+          <span class="seal">数位</span>
+          <span class="art">4 7 3 2</span>
+          <h3>Place Value</h3>
+          <span class="py">shù wèi</span>
+          <p>Digit values and rounding</p>
+        </button>
+      </div>
+
+      <h2 class="section-h">Fractions, problems and measures</h2>
+      <div class="tiles">
+        <button class="tile plum" data-game="fractions">
+          <span class="seal">分数</span>
+          <span class="art"><span class="frac"><span>3</span><span>4</span></span></span>
+          <h3>Fractions</h3>
+          <span class="py">fēn shù</span>
+          <p>Shade, compare and find fractions of amounts</p>
+        </button>
+        <button class="tile blue" data-game="bars">
+          <span class="seal">线段图</span>
+          <span class="art"><span class="art-bars"><i></i><i></i></span></span>
+          <h3>Bar Models</h3>
+          <span class="py">xiàn duàn tú</span>
+          <p>Draw the problem, then solve it</p>
+        </button>
+        <button class="tile" data-game="fdp">
+          <span class="seal">百分数</span>
+          <span class="art"><span class="art-hund" id="artHund"></span></span>
+          <h3>Decimals and Percentages</h3>
+          <span class="py">bǎi fēn shù</span>
+          <p>Hundred squares and percentages of amounts</p>
+        </button>
+        <button class="tile jade" data-game="area">
+          <span class="seal">面积</span>
+          <span class="art">cm²</span>
+          <h3>Area and Perimeter</h3>
+          <span class="py">miàn jī</span>
+          <p>Rectangles and L-shapes</p>
+        </button>
+      </div>
+
+      <details class="grown" id="settings">
+        <summary>Grown-up settings: timer, stars and voice</summary>
+        <div class="set-group">
+          <h4>Play timer</h4>
+          <p class="set-note">Pick how long to play. A countdown shows at the top, and Bao says when time is up.</p>
+          <div class="chips" id="timerChips" role="group" aria-label="Play time">
+            <button class="chip-btn" data-min="0" aria-pressed="true">Off</button>
+            <button class="chip-btn" data-min="10" aria-pressed="false">10 min</button>
+            <button class="chip-btn" data-min="15" aria-pressed="false">15 min</button>
+            <button class="chip-btn" data-min="20" aria-pressed="false">20 min</button>
+            <button class="chip-btn" data-min="30" aria-pressed="false">30 min</button>
+          </div>
+          <p class="set-note" id="timerStatus" hidden></p>
+        </div>
+        <div class="set-group">
+          <h4>Read questions aloud</h4>
+          <p class="set-note">Off by default for KS2. The green speaker button always reads the question.</p>
+          <div class="chips" id="readChips" role="group" aria-label="Read questions aloud">
+            <button class="chip-btn" data-read="off" aria-pressed="true">Off</button>
+            <button class="chip-btn" data-read="on" aria-pressed="false">On</button>
+          </div>
+        </div>
+        <div class="set-group">
+          <h4>Stars</h4>
+          <p class="set-note" id="starNote">No stars yet.</p>
+          <div class="chips" id="resetRow"><button class="chip-btn danger" id="resetBtn">Reset stars to 0</button></div>
+          <div class="chips" id="confirmRow" hidden><span class="set-note" id="confirmText"></span><button class="chip-btn danger" id="resetYes">Yes, reset</button><button class="chip-btn" id="resetNo">Cancel</button></div>
+        </div>
+      </details>
+
+      <details class="grown">
+        <summary>For grown-ups: what this covers</summary>
+        <p>Each game follows the Key Stage 2 maths programme of study for England. The year group switch sets the level: Years 3–4, Year 5 or Year 6. Many UK schools now teach "maths mastery", which grew out of teacher exchanges with Shanghai from 2014, and these games use the same methods.</p>
+        <ul>
+          <li><span class="zh">乘法口诀</span> <b>Times Tables.</b> Year 3 tables (2, 3, 4, 5, 8, 10), then all tables to 12 × 12. Year 6 mode copies the Year 4 Multiplication Tables Check: 6 seconds per question, with missing numbers and division. Answers show the matching line of the Chinese times-table rhyme.</li>
+          <li><span class="zh">竖式</span> <b>Column Methods.</b> Formal written addition and subtraction, one column at a time from the ones. Carries and exchanges are shown as they happen; Year 6 includes subtracting across zeros.</li>
+          <li><span class="zh">巧算</span> <b>Clever Calculating.</b> Mental strategies: bonds to 100, adding 9 as "add 10, take 1", compensating with 99, and making 100 or 1,000 with 25 × 4 and 125 × 8.</li>
+          <li><span class="zh">数位</span> <b>Place Value.</b> The value of each digit and rounding on a number line, up to 10 million and three decimal places in Year 6.</li>
+          <li><span class="zh">分数</span> <b>Fractions.</b> Naming fractions, shading equivalent fractions, comparing, fractions of amounts, and adding fractions with related denominators.</li>
+          <li><span class="zh">线段图</span> <b>Bar Models.</b> Word problems drawn as bars: part-whole, comparison and, in Year 6, the "units" method for multiples and ratio.</li>
+          <li><span class="zh">百分数</span> <b>Decimals and Percentages.</b> Hundred squares for tenths, hundredths and percentages, then percentages of amounts.</li>
+          <li><span class="zh">面积</span> <b>Area and Perimeter.</b> Counting squares, then using length × width, then L-shapes made of two rectangles.</li>
+        </ul>
+        <p>Stars are saved on this device only. A wrong answer has no penalty; the game gives a hint and lets the child try again.</p>
+      </details>
+    </section>
+
+    <section class="screen" id="game" hidden>
+      <div class="game-head"><span class="seal" id="gSeal"></span><h2 id="gTitle"></h2></div>
+      <div class="levels" role="group" aria-label="Year group"><span class="lv-label">Year<br>group</span><button class="lv" data-level="easy" aria-pressed="true">Y3–4<i>★</i></button><button class="lv" data-level="medium" aria-pressed="false">Y5<i>★★</i></button><button class="lv" data-level="hard" aria-pressed="false">Y6<i>★★★</i></button></div>
+      <div class="prompt">
+        <button class="say-btn" id="sayBtn" aria-label="Read the question aloud">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#fff"/><path d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg>
+        </button>
+        <p id="promptText" aria-live="polite"></p>
+      </div>
+      <div class="stage" id="stage"></div>
+      <div class="answers" id="answers"></div>
+      <details class="grown"><summary>How this works</summary><p id="gTip"></p></details>
+    </section>
+  </main>
+</div>
+
+<div class="cheer" id="cheer" hidden>
+  <div class="cheer-card" role="dialog" aria-labelledby="cheerTitle">
+    <span data-panda></span>
+    <h2 id="cheerTitle">Brilliant!</h2>
+    <p id="cheerText"></p>
+    <button id="cheerBtn">Keep going</button>
+  </div>
+</div>
+<div class="cheer" id="timesUp" hidden>
+  <div class="cheer-card" role="dialog" aria-labelledby="tuTitle">
+    <span data-panda></span>
+    <h2 id="tuTitle">Time's up!</h2>
+    <p id="tuText"></p>
+    <button id="tuDone">All done</button>
+    <button class="hold" id="tuMore"><span>Grown-ups: hold for 5 more minutes</span></button>
+  </div>
+</div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+/* Bao again, now with reading glasses for KS2 */
+const PANDA='<svg class="panda" viewBox="0 0 120 120" aria-hidden="true"><circle class="pk" cx="27" cy="28" r="17"/><circle class="pk" cx="93" cy="28" r="17"/><circle class="pw" cx="60" cy="64" r="45" style="stroke:var(--ink);stroke-width:4"/><ellipse class="pk" cx="41" cy="60" rx="12" ry="15" transform="rotate(-22 41 60)"/><ellipse class="pk" cx="79" cy="60" rx="12" ry="15" transform="rotate(22 79 60)"/><circle class="pw" cx="43" cy="58" r="4.5"/><circle class="pw" cx="77" cy="58" r="4.5"/><circle class="pg" cx="41" cy="60" r="15"/><circle class="pg" cx="79" cy="60" r="15"/><path class="pg" d="M56 58q4-3 8 0"/><circle class="pc" cx="31" cy="82" r="7"/><circle class="pc" cx="89" cy="82" r="7"/><ellipse class="pk" cx="60" cy="78" rx="7" ry="5"/><path class="ps" d="M51 87q9 9 18 0"/></svg>';
+document.querySelectorAll('[data-panda]').forEach(el=>el.outerHTML=PANDA);
+$('#artHund').innerHTML=Array.from({length:100},(_,i)=>`<i${i%10<7?' class="f"':''}></i>`).join('');
+
+/* ---------- state ---------- */
+let stars=0, soundOn=true, level='easy', readAloud=false;
+try{stars=parseInt(localStorage.getItem('bpm-stars'),10)||0}catch(e){}
+try{soundOn=localStorage.getItem('bpm-sound')!=='off'}catch(e){}
+try{readAloud=localStorage.getItem('bpm-read')==='on'}catch(e){}
+try{const l=localStorage.getItem('bpm-level');if(['easy','medium','hard'].includes(l))level=l}catch(e){}
+const starCount=$('#starCount'), starBox=$('#starBox');
+function showStars(){
+  starCount.textContent=stars;
+  const note=document.getElementById('starNote');if(note)note.textContent=stars?`Stars earned so far: ${stars}.`:'No stars yet.';
+  const rb=document.getElementById('resetBtn');if(rb)rb.disabled=!stars;
+}
+
+/* ---------- voice ---------- */
+/* Rank voices: British English first, then the higher-quality neural/enhanced voices, and never the novelty ones */
+let voice=null;
+function voiceScore(v){
+  const n=v.name.toLowerCase(),l=(v.lang||'').toLowerCase().replace('_','-');
+  if(!l.startsWith('en'))return -1;
+  if(/albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|good news|grandma|grandpa|hysterical|jester|junior|organ|ralph|fred|superstar|trinoids|whisper|wobble|zarvox/.test(n))return -1;
+  let s=l==='en-gb'?30:/^en-(au|ie|nz)/.test(l)?20:10;
+  if(/natural|neural|premium|enhanced/.test(n))s+=40;
+  if(/google uk english female|sonia|libby|serena|kate|martha|stephanie|samantha|karen|moira|tessa|aria|jenny/.test(n))s+=20;
+  if(v.localService===false)s+=5;
+  return s;
+}
+function pickVoice(){
+  try{
+    let best=null,top=-1;
+    speechSynthesis.getVoices().forEach(v=>{const s=voiceScore(v);if(s>top){top=s;best=v}});
+    voice=best;
+  }catch(e){}
+}
+if('speechSynthesis' in window){pickVoice();try{speechSynthesis.onvoiceschanged=pickVoice}catch(e){}}
+/* iOS only lets speech start inside a tap, so unlock it with a silent utterance on the first touch */
+if('speechSynthesis' in window)document.addEventListener('pointerdown',()=>{try{const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u)}catch(e){}},{once:true});
+const speakable=t=>t.replace(/×/g,' times ').replace(/÷/g,' divided by ').replace(/−/g,' minus ').replace(/\+/g,' plus ').replace(/=/g,' equals ').replace(/cm²/g,' square centimetres').replace(/\bcm\b/g,' centimetres').replace(/%/g,' percent').replace(/\?/g,' what ');
+let sayTimer=null;
+/* Speech only plays when "read aloud" is on, or when force is set (the speaker button) */
+function say(t,force){
+  if(!soundOn||!(readAloud||force)||!('speechSynthesis' in window))return;
+  try{
+    clearTimeout(sayTimer);
+    const busy=speechSynthesis.speaking||speechSynthesis.pending;
+    speechSynthesis.cancel();
+    /* Speaking straight after cancel() clips the first word in Chrome and Safari, so wait a moment */
+    sayTimer=setTimeout(()=>{
+      const u=new SpeechSynthesisUtterance(speakable(t));
+      if(voice){u.voice=voice;u.lang=voice.lang}else u.lang='en-GB';
+      u.rate=.9;u.pitch=1;
+      speechSynthesis.speak(u);
+    },busy?220:80);
+  }catch(e){}
+}
+
+/* ---------- sound effects (pentatonic scale) ---------- */
+let ac=null;
+const PENTA=[523.25,587.33,659.25,783.99,880,1046.5,1174.66,1318.51,1567.98,1760];
+function tone(f,dur,type,when,vol){
+  if(!soundOn)return;
+  try{
+    ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+    if(ac.state==='suspended')ac.resume();
+    const t=ac.currentTime+(when||0),o=ac.createOscillator(),g=ac.createGain();
+    o.type=type||'triangle';o.frequency.setValueAtTime(f,t);
+    g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol||.16,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    o.connect(g).connect(ac.destination);o.start(t);o.stop(t+dur+.05);
+  }catch(e){}
+}
+const sfx={
+  note:i=>tone(PENTA[Math.max(0,Math.min(9,i))],.2),
+  click:()=>tone(990,.05,'square',0,.035),
+  yay:()=>[0,2,4,5,7].forEach((n,i)=>tone(PENTA[n],.26,'triangle',i*.07)),
+  oops:()=>{tone(260,.2,'sine',0,.13);tone(196,.28,'sine',.12,.11)}
+};
+
+$('#soundBtn').onclick=()=>{
+  soundOn=!soundOn;
+  try{localStorage.setItem('bpm-sound',soundOn?'on':'off')}catch(e){}
+  $('#soundWaves').toggleAttribute('hidden',!soundOn);
+  $('#soundX').toggleAttribute('hidden',soundOn);
+  $('#soundBtn').setAttribute('aria-label',soundOn?'Turn sound off':'Turn sound on');
+  if(!soundOn){try{speechSynthesis.cancel()}catch(e){}}else sfx.click();
+};
+if(!soundOn){$('#soundWaves').setAttribute('hidden','');$('#soundX').removeAttribute('hidden');$('#soundBtn').setAttribute('aria-label','Turn sound on')}
+
+/* ---------- helpers ---------- */
+const rand=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const pl=(k,word)=>`${k} ${word}${k===1?'':'s'}`;
+const fmt=n=>Number(n).toLocaleString('en-GB',{maximumFractionDigits:3});
+const gcd=(a,b)=>b?gcd(b,a%b):a;
+const frac=(n,d)=>`<span class="frac"><span>${n}</span><span>${d}</span></span>`;
+const DEN={2:['half','halves'],3:['third','thirds'],4:['quarter','quarters'],5:['fifth','fifths'],6:['sixth','sixths'],8:['eighth','eighths'],9:['ninth','ninths'],10:['tenth','tenths'],12:['twelfth','twelfths'],100:['hundredth','hundredths']};
+const fracWords=(n,d)=>DEN[d]?(n===1?'one '+DEN[d][0]:`${n} ${DEN[d][1]}`):`${n} over ${d}`;
+/* Remember the last question per game so the same one doesn't come straight back */
+const lastQ={};
+function fresh(key,fn){let v,g=0;do{v=fn()}while(v===lastQ[key]&&g++<12);lastQ[key]=v;return v}
+const stage=$('#stage'),answers=$('#answers'),promptText=$('#promptText');
+let current=null,spoken='',timers=[],keyHandler=null;
+function later(fn,ms){const t=setTimeout(fn,ms);timers.push(t);return t}
+function stopTimers(){timers.forEach(clearTimeout);timers=[]}
+function setPrompt(text,speech){promptText.textContent=text;spoken=speech||text;say(spoken)}
+$('#sayBtn').onclick=()=>say(spoken,true);
+function clearAnswers(){answers.innerHTML='';answers.className='answers';answers.style.setProperty('--cols',1);keyHandler=null}
+document.addEventListener('keydown',e=>{if(keyHandler&&!game.hidden&&!e.metaKey&&!e.ctrlKey){const k=e.key==='Enter'?'ok':e.key==='Backspace'?'del':e.key;if(/^([0-9.]|ok|del)$/.test(k)){e.preventDefault();keyHandler(k)}}});
+
+/* Multiple choice: each option has a value, a label for speech, and optional HTML */
+function askOpts(opts,right,onRight,onWrong){
+  clearAnswers();
+  const text=opts.some(o=>o.label.length>14&&!o.html);
+  answers.className='answers'+(text?' list':'');
+  answers.style.setProperty('--cols',text?1:Math.min(opts.length,3));
+  opts.forEach(o=>{
+    const b=document.createElement('button');b.className='opt';b.innerHTML=o.html||o.label;
+    b.onclick=()=>{
+      const v=o.value??o.label;
+      if(v===right){b.classList.add('right');[...answers.children].forEach(x=>x.disabled=true);win(onRight)}
+      else{b.classList.add('wrong');b.disabled=true;sfx.oops();const h=onWrong&&onWrong(o);say(h||'Not quite. Try again.')}
+    };
+    answers.appendChild(b);
+  });
+}
+/* Number pad: digits fill the entry box, ✓ checks it. Physical keyboards work too. */
+function makePad(onKey,{decimal,ok=true}={}){
+  const pad=document.createElement('div');pad.className='pad';
+  const keys=['7','8','9','4','5','6','1','2','3',...(!ok?['','0','']:decimal?['.','0','del','ok']:['del','0','ok'])];
+  keys.forEach(k=>{
+    const b=document.createElement('button');b.className='key'+(k==='ok'?' ok':k==='del'?' del':'');
+    if(!k){b.disabled=true;b.style.visibility='hidden'}
+    if(k==='ok'&&decimal)b.style.gridColumn='1/-1';
+    b.textContent=k==='ok'?'✓':k==='del'?'⌫':k;b.setAttribute('aria-label',k==='ok'?'Check':k==='del'?'Delete':k);
+    b.onclick=()=>{sfx.click();onKey(k)};pad.appendChild(b);
+  });
+  keyHandler=onKey;
+  return pad;
+}
+function askNumber({answer,unit,decimal,onRight,onWrong}){
+  clearAnswers();
+  answers.insertAdjacentHTML('beforeend',`<div class="entry-row"><div class="entry" id="entry" aria-live="polite"></div>${unit?`<span class="unit">${unit}</span>`:''}</div>`);
+  const entry=$('#entry');let val='',locked=false,tries=0;
+  const pad=makePad(k=>{
+    if(locked)return;
+    if(k==='del'){val=val.slice(0,-1)}
+    else if(k==='ok'){
+      if(!val)return;
+      if(Math.abs(parseFloat(val)-answer)<1e-9){locked=true;entry.classList.add('right');pad.querySelectorAll('.key').forEach(x=>x.disabled=true);keyHandler=null;win(onRight);return}
+      tries++;entry.classList.remove('wrong');void entry.offsetWidth;entry.classList.add('wrong');sfx.oops();
+      const h=onWrong&&onWrong(parseFloat(val),tries);say(h||'Not quite. Try again.');val='';
+    }
+    else if(val.length<8&&!(k==='.'&&val.includes('.'))){val+=k}
+    entry.textContent=val;
+  },{decimal});
+  answers.appendChild(pad);
+  return{lock(show){locked=true;keyHandler=null;pad.querySelectorAll('.key').forEach(x=>x.disabled=true);if(show!==undefined){entry.textContent=show;entry.classList.add('wrong')}}};
+}
+function win(after){
+  sfx.yay();stars++;
+  try{localStorage.setItem('bpm-stars',stars)}catch(e){}
+  showStars();starBox.classList.remove('bump');void starBox.offsetWidth;starBox.classList.add('bump');
+  burst(50);
+  if(after)after();
+  later(showNext,1000);
+  if(stars%10===0)setTimeout(showCheer,1900);
+}
+function showNext(){
+  clearAnswers();
+  const b=document.createElement('button');b.className='next';b.innerHTML='Next <span aria-hidden="true">&#10140;</span>';
+  b.onclick=()=>{b.disabled=true;sfx.click();play()};
+  answers.appendChild(b);
+  keyHandler=k=>{if(k==='ok')b.click()};
+}
+function showFact(f,miss){stage.insertAdjacentHTML('beforeend',`<p class="fact${miss?' miss':''}">${f}</p>`)}
+function showHint(h){const old=stage.querySelector('.hint');if(old)old.innerHTML=h;else stage.insertAdjacentHTML('beforeend',`<p class="hint">${h}</p>`)}
+function fillQ(v,cls){const q=stage.querySelector('.sum .q');if(q){q.innerHTML=v;q.classList.add(cls||'ok')}}
+const sumHTML=s=>`<div class="sum">${s.replace('?','<span class="q">?</span>')}</div>`;
+
+/* 九九 times-table rhyme line, e.g. 3 x 5 -> 三五十五 sān wǔ shí wǔ */
+const ZH='零一二三四五六七八九十'.split(''),ZPY=['líng','yī','èr','sān','sì','wǔ','liù','qī','bā','jiǔ','shí'];
+function rhyme(a,b){
+  if(a>9||b>9||a<1||b<1)return null;
+  if(a>b)[a,b]=[b,a];
+  const p=a*b,tail=p<10?['得',p]:p===10?[1,10]:p<20?[10,p-10]:[Math.floor(p/10),10].concat(p%10?[p%10]:[]);
+  const parts=[a,b,...tail];
+  return{zh:parts.map(x=>x==='得'?'得':ZH[x]).join(''),py:parts.map(x=>x==='得'?'dé':ZPY[x]).join(' ')};
+}
+
+/* ---------- games ---------- */
+const NAMES=['Amara','Ben','Priya','Leo','Zara','Tom','Mia','Ali','Ella','Jun','Ravi','Grace'];
+const THINGS=['stickers','marbles','football cards','stamps','beads','shells'];
+function two(){const a=pick(NAMES);let b;do{b=pick(NAMES)}while(b===a);return[a,b]}
+function barModel(rows,total){
+  const max=Math.max(...rows.map(r=>r.segs.reduce((s,g)=>s+g.v,0)));
+  return `<div class="bm">${rows.map(r=>`<div class="bm-row"><span class="bm-name">${r.name}</span><div class="bm-bar">${r.segs.map(g=>`<span class="seg ${g.cls||''}" style="width:${g.v/max*100}%">${g.t}</span>`).join('')}</div></div>`).join('')}${total?`<div class="bm-total"><span class="brace"></span><b>${total}</b></div>`:''}</div>`;
+}
+function numberLine(lo,hi,n,dp){
+  const x=v=>30+(v-lo)/(hi-lo)*280,mid=(lo+hi)/2,f=v=>fmt(+v.toFixed(dp));
+  return `<svg class="nl" viewBox="0 0 340 90" role="img" aria-label="Number line from ${f(lo)} to ${f(hi)}"><line x1="30" y1="50" x2="310" y2="50" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/>
+    ${[lo,mid,hi].map((v,i)=>`<line x1="${x(v)}" y1="${i===1?40:34}" x2="${x(v)}" y2="${i===1?60:66}" stroke="var(--ink)" stroke-width="${i===1?2.5:4}"/><text x="${x(v)}" y="84" text-anchor="middle"${i===1?' fill="var(--ink-soft)" style="fill:var(--ink-soft)"':''}>${f(v)}</text>`).join('')}
+    <circle cx="${x(n)}" cy="50" r="9" fill="var(--red)"/><text x="${x(n)}" y="24" text-anchor="middle" style="fill:var(--red)">${f(n)}</text></svg>`;
+}
+function hundred(k,cols){
+  return `<svg class="hund" viewBox="0 0 222 222" role="img" aria-label="Hundred square">${Array.from({length:100},(_,i)=>{const r=Math.floor(i/10),c=i%10,on=cols?c<k:i<k;return `<rect x="${2+c*22}" y="${2+r*22}" width="20" height="20" rx="3" fill="${on?'var(--plum)':'var(--grid)'}" opacity="${on?1:.5}"/>`}).join('')}</svg>`;
+}
+
+const GAMES={
+  times:{
+    title:'Times Tables',seal:'乘法口诀',
+    tip:'Knowing times tables by heart makes every other part of maths easier. In Year 4, children in England take the Multiplication Tables Check: 25 questions with 6 seconds each. Chinese children learn the same facts as a chanted rhyme.',
+    levels:{easy:'Years 3–4: the 2, 3, 4, 5, 8 and 10 times tables.',medium:'Year 5: every table up to 12 × 12.',hard:'Year 6: check mode. 6 seconds per question, with missing numbers and division.'},
+    round(){
+      const T=level==='easy'?[2,3,4,5,8,10]:[2,3,4,5,6,7,8,9,10,11,12];
+      let a=2,b=2;fresh('times',()=>{a=pick(T);b=rand(2,12);return a*100+b});
+      const p=a*b,kind=level==='hard'?pick(['times','times','missing','divide']):'times';
+      const [text,ans]=kind==='missing'?[`? × ${a} = ${p}`,b]:kind==='divide'?[`${p} ÷ ${a} = ?`,b]:[`${b} × ${a} = ?`,p];
+      stage.innerHTML=sumHTML(text)+(level==='hard'?'<div class="countdown"><i></i></div>':'');
+      setPrompt(text);
+      const r=rhyme(a,b),fact=`${b} × ${a} = ${p}, so ${p} ÷ ${a} = ${b}.`+(r?`<br><span style="font-family:var(--han)">${r.zh}</span> ${r.py}`:'');
+      let clock=null;
+      const ui=askNumber({answer:ans,onRight:()=>{clearTimeout(clock);stage.querySelector('.countdown')?.remove();fillQ(ans);showFact(fact)},
+        onWrong:()=>level==='easy'?(showHint(`Count up in ${a}s: ${Array.from({length:Math.min(b,4)},(_,i)=>a*(i+1)).join(', ')}…`),`Count up in ${a}s.`):null});
+      if(level==='hard')clock=later(()=>{ui.lock();fillQ(ans,'miss');showFact(`Time's up for this one. ${fact}`,true);say(`Time's up. ${b} times ${a} is ${p}.`);later(showNext,1400)},6000);
+    }
+  },
+  column:{
+    title:'Column Methods',seal:'竖式',
+    tip:'Line the numbers up in columns and start with the ones. When a column adds up to 10 or more, carry a 1 into the next column. When the top digit is too small to subtract, exchange 1 from the next column (10 ones for a ten). Type each answer digit, starting with the ones.',
+    levels:{easy:'Years 3–4: adding 3-digit numbers, with carries.',medium:'Year 5: adding and subtracting 4-digit numbers.',hard:'Year 6: subtracting 5-digit numbers, including across zeros.'},
+    round(){
+      let a,b,op,g=0;
+      const exch=(x,y)=>{let c=0,n=0;for(let i=0;i<6;i++){const d=Math.floor(x/10**i)%10-c,e=Math.floor(y/10**i)%10;c=d<e?1:0;n+=c}return n};
+      const carries=(x,y)=>{let c=0,n=0;for(let i=0;i<6;i++){c=Math.floor(x/10**i)%10+Math.floor(y/10**i)%10+c>9?1:0;n+=c}return n};
+      do{
+        if(level==='easy'){op='+';a=rand(120,899);b=rand(110,899)}
+        else if(level==='medium'){op=pick(['+','−']);a=rand(2000,9899);b=rand(1100,op==='+'?9899:a-100)}
+        else{op='−';a=rand(2,9)*10000+[0,rand(1,9)][rand(0,1)]*1000+[0,rand(1,9)][rand(0,1)]*100+[0,rand(1,9)][rand(0,1)]*10+rand(0,9);b=rand(10000,a-1000)}
+      }while(++g<200&&(op==='+'?carries(a,b)<(level==='easy'?1:2):exch(a,b)<(level==='hard'?2:1)));
+      const r=op==='+'?a+b:a-b,n=Math.max(String(a).length,String(b).length,String(r).length),dig=(x,i)=>i<String(x).length?Math.floor(x/10**i)%10:null;
+      /* Work out every column first: the carry into it, or what the top digit becomes after exchanging */
+      const cols=[];let c=0;
+      for(let i=0;i<n;i++){
+        const t=dig(a,i),bb=dig(b,i)??0;
+        if(op==='+'){const s=(t??0)+bb+c;cols.push({t,b:dig(b,i),cin:c,s,r:s%10});c=s>9?1:0}
+        else{let adj=(t??0)-c,out=0;if(adj<bb){adj+=10;out=1}cols.push({t,b:dig(b,i),bin:c,adj,changed:c||out,out,r:adj-bb});c=out}
+      }
+      const rl=String(r).length;
+      const cell=(cls,txt,id)=>`<span class="c ${cls}"${id?` id="${id}"`:''}>${txt??''}</span>`;
+      let html=`<div class="col" style="grid-template-columns:repeat(${n+1},auto)">`;
+      html+=cell('mark','')+Array.from({length:n},(_,j)=>cell('mark','',`m${n-1-j}`)).join('');
+      html+=cell('op','')+Array.from({length:n},(_,j)=>cell('',dig(a,n-1-j),`t${n-1-j}`)).join('');
+      html+=cell('op',op)+Array.from({length:n},(_,j)=>cell('',dig(b,n-1-j))).join('');
+      html+='<span class="rule"></span>'+cell('op','')+Array.from({length:n},(_,j)=>{const i=n-1-j;return i<rl?cell('box','',`r${i}`):cell('','')}).join('');
+      if(op==='+')html+=cell('carry','')+Array.from({length:n},(_,j)=>cell('carry','',`k${n-1-j}`)).join('');
+      html+='</div>';
+      stage.innerHTML=html;
+      const text=`Work out ${fmt(a)} ${op} ${fmt(b)} in columns. Start with the ones.`;
+      setPrompt(text,`Work out ${a} ${op} ${b} in columns. Start with the ones.`);
+      const PLACE=['ones','tens','hundreds','thousands','ten thousands','hundred thousands'];
+      /* Show the exchange: this column's new top digit, and the next column reduced by 1 (zeros get sorted out when reached) */
+      const showExchange=i=>{const k=cols[i];if(op!=='−'||!k.changed||k.t===null)return;$('#m'+i).textContent=k.adj;$('#t'+i).classList.add('x');const nx=cols[i+1];if(k.out&&nx&&nx.t>0&&!$('#m'+(i+1)).textContent){$('#m'+(i+1)).textContent=nx.t-1;$('#t'+(i+1)).classList.add('x')}};
+      let i=0;const cur=()=>{stage.querySelectorAll('.box').forEach(x=>x.classList.remove('cur'));const bx=$('#r'+i);if(bx)bx.classList.add('cur');if(level!=='hard')showExchange(i)};
+      cur();
+      const explain=i=>{const k=cols[i],p=PLACE[i];
+        if(op==='+')return `${p[0].toUpperCase()+p.slice(1)}: ${k.t??0} + ${k.b??0}${k.cin?' + 1 carried':''} = ${k.s}. Write ${k.r}${k.s>9?' and carry 1':''}.`;
+        return `${p[0].toUpperCase()+p.slice(1)}: ${k.out?`exchange 1 from the next column, so it's `:''}${k.adj} − ${k.b??0} = ${k.r}.`};
+      clearAnswers();
+      answers.appendChild(makePad(key=>{
+        if(i>=rl||!/^\d$/.test(key))return;
+        const bx=$('#r'+i);
+        if(+key===cols[i].r){
+          bx.textContent=key;bx.classList.remove('cur','wrong');bx.classList.add('done');sfx.note(i+2);
+          if(op==='+'&&cols[i].s>9&&$('#k'+(i+1)))$('#k'+(i+1)).textContent='1';
+          if(level==='hard')showExchange(i);
+          i++;
+          if(i===rl){keyHandler=null;answers.querySelectorAll('.key').forEach(x=>x.disabled=true);win(()=>showFact(`${fmt(a)} ${op} ${fmt(b)} = ${fmt(r)}`))}
+          else cur();
+        }else{bx.classList.remove('wrong');void bx.offsetWidth;bx.classList.add('wrong');sfx.oops();if(level==='hard')showExchange(i);const h=explain(i);showHint(h);say(h)}
+      },{ok:false}));
+    }
+  },
+  clever:{
+    title:'Clever Calculating',seal:'巧算',
+    tip:'Chinese classrooms call these 简便计算, "simple calculations": spotting a shortcut before you start. Adding 99 is the same as adding 100 and taking 1 away, and 25 × 4 makes 100.',
+    levels:{easy:'Years 3–4: bonds to 100, and adding or subtracting 9 or 19.',medium:'Year 5: adding and subtracting near-hundreds, and × 5.',hard:'Year 6: making 100 and 1,000 with 25 × 4 and 125 × 8, × 99 and grouping.'},
+    round(){
+      const Q={
+        easy:[
+          ()=>{const a=rand(11,89);return[`${a} + ? = 100`,100-a,`${a} + ${(10-a%10)%10||10} = ${a+((10-a%10)%10||10)}, then count on in tens to 100.`]},
+          ()=>{const a=rand(21,89),n=pick([9,19,29]);return[`${a} + ${n} = ?`,a+n,`${a} + ${n+1} − 1 = ${a+n}`]},
+          ()=>{const a=rand(40,99),n=pick([9,19]);return[`${a} − ${n} = ?`,a-n,`${a} − ${n+1} + 1 = ${a-n}`]}
+        ],
+        medium:[
+          ()=>{const a=rand(120,880),n=pick([99,199,299]);return[`${a} + ${n} = ?`,a+n,`${a} + ${n+1} − 1 = ${a+n}`]},
+          ()=>{const a=rand(120,880),n=pick([101,201]);return[`${a} + ${n} = ?`,a+n,`${a} + ${n-1} + 1 = ${a+n}`]},
+          ()=>{const a=rand(320,980),n=pick([98,99,198,199]),u=Math.ceil(n/100)*100;return[`${a} − ${n} = ?`,a-n,`${a} − ${u} + ${u-n} = ${a-n}`]},
+          ()=>{const a=rand(12,48)*2;return[`${a} × 5 = ?`,a*5,`${a} × 10 ÷ 2 = ${a*10} ÷ 2 = ${a*5}`]}
+        ],
+        hard:[
+          ()=>{const k=rand(2,9);return[`25 × ${4*k} = ?`,100*k,`25 × 4 × ${k} = 100 × ${k} = ${100*k}`]},
+          ()=>{const k=rand(2,9);return[`125 × ${8*k} = ?`,1000*k,`125 × 8 × ${k} = 1,000 × ${k} = ${fmt(1000*k)}`]},
+          ()=>{const n=pick([99,999]),k=rand(3,9);return[`${n} × ${k} = ?`,n*k,`${n+1} × ${k} − ${k} = ${fmt((n+1)*k)} − ${k} = ${fmt(n*k)}`]},
+          ()=>{const a=rand(3,9),b=rand(11,89);return[`${a} × ${b} + ${a} × ${100-b} = ?`,a*100,`${a} × (${b} + ${100-b}) = ${a} × 100 = ${a*100}`]},
+          ()=>{const a=rand(101,899);return[`${a} + 375 + 625 = ?`,a+1000,`375 + 625 = 1,000, so it's ${a} + 1,000 = ${fmt(a+1000)}`]}
+        ]
+      };
+      let q;fresh('clever',()=>{q=pick(Q[level])();return q[0]});
+      const [text,ans,way]=q;
+      stage.innerHTML=sumHTML(text.replace(/\d{4,}/g,m=>fmt(+m)))+'<button class="hint-btn" id="wayBtn">Show me the clever way</button>';
+      setPrompt('Find the clever way to work it out: '+text,text);
+      $('#wayBtn').onclick=e=>{e.target.remove();showHint(way);say(way,false)};
+      askNumber({answer:ans,onRight:()=>{fillQ(fmt(ans));$('#wayBtn')?.remove();stage.querySelector('.hint')?.remove();showFact('The clever way: '+way)},onWrong:(v,t)=>{if(t>=2){$('#wayBtn')?.remove();showHint(way)}return null}});
+    }
+  },
+  place:{
+    title:'Place Value',seal:'数位',
+    tip:'The value of a digit depends on its place: in 4,732 the 7 is worth 700. To round, find the two numbers it sits between and see which is closer. A number exactly halfway rounds up.',
+    levels:{easy:'Years 3–4: numbers up to 9,999, rounding to 10 or 100.',medium:'Year 5: numbers up to 999,999, rounding to 1,000 or 10,000.',hard:'Year 6: up to 10 million, plus decimals to three places.'},
+    round(){
+      const L={easy:{max:9999,to:[10,100]},medium:{max:999999,to:[1000,10000]},hard:{max:9999999,to:[100000,1000000]}}[level];
+      const kind=level==='hard'?pick(['value','round','dvalue','dround']):pick(['value','round']);
+      if(kind==='value'){
+        let n,p;fresh('pv',()=>{n=rand(Math.ceil(L.max/10),L.max);const s=String(n);do{p=rand(0,s.length-1)}while(s[s.length-1-p]==='0');return n});
+        const s=String(n),d=+s[s.length-1-p],val=d*10**p;
+        const ps=shuffle([...new Set([...Array(s.length).keys()].filter(x=>x!==p))]).slice(0,2);
+        stage.innerHTML=`<div class="sum">${fmt(n)}</div>`;
+        setPrompt(`What is the value of the digit ${d} in ${fmt(n)}?`,`What is the value of the ${d} in ${n}?`);
+        return askOpts(shuffle([val,...ps.map(x=>d*10**x)].map(v=>({label:fmt(v),value:v}))),val,()=>showFact(`The ${d} is in the ${['ones','tens','hundreds','thousands','ten thousands','hundred thousands','millions'][p]} column, so it is worth ${fmt(val)}.`));
+      }
+      if(kind==='dvalue'){
+        const n=rand(1001,9999),s=String(n),pp=rand(1,3),d=+s[pp]||rand(1,9);
+        const digits=s.split('');digits[pp]=String(d);const num=digits.join('').replace(/^(\d)/,'$1.');
+        const names=['','tenths','hundredths','thousandths'],val=(d/10**pp).toFixed(pp);
+        stage.innerHTML=`<div class="sum">${num}</div>`;
+        setPrompt(`What is the value of the digit ${d} in ${num}?`);
+        const opts=[1,2,3].map(x=>({label:(d/10**x).toFixed(x),value:(d/10**x).toFixed(x)}));
+        return askOpts(opts,val,()=>showFact(`The ${d} is in the ${names[pp]} column, so it is worth ${val}.`));
+      }
+      let n,to,dp=0;
+      if(kind==='round'){to=pick(L.to);fresh('pr',()=>{n=rand(to,Math.min(L.max,to*100));return n});if(n%to===0)n+=rand(1,to-1)}
+      else{to=pick([1,.1]);dp=to===1?1:2;n=+(rand(10,999)/(to===1?10:100)).toFixed(dp);if(Math.abs(n/to-Math.round(n/to))<1e-9)n=+(n+(to===1?.3:.03)).toFixed(dp)}
+      const lo=+(Math.floor(n/to+1e-9)*to).toFixed(dp),hi=+(lo+to).toFixed(dp),ans=n-lo>=to/2-1e-9?hi:lo;
+      const toLabel=to>=1?fmt(to):'tenth';
+      stage.innerHTML=numberLine(lo,hi,n,dp);
+      setPrompt(`Round ${fmt(n)} to the nearest ${to===1?'whole number':toLabel}.`);
+      const halfway=Math.abs(n-lo-to/2)<1e-9;
+      askOpts([lo,hi].map(v=>({label:fmt(v),value:v})),ans,()=>showFact(halfway?`${fmt(n)} is exactly halfway, and halfway rounds up to ${fmt(ans)}.`:`${fmt(n)} is closer to ${fmt(ans)} than to ${fmt(ans===lo?hi:lo)}.`),
+        ()=>`Look at the halfway mark, ${fmt(+((lo+hi)/2).toFixed(dp+1))}. Is ${fmt(n)} before or after it?`);
+    }
+  },
+  fractions:{
+    title:'Fractions',seal:'分数',
+    tip:'A fraction is equal parts of a whole: the bottom number says how many parts, the top says how many we have. Equivalent fractions name the same amount, like one half and four eighths. To find three quarters of 28, divide by 4 and multiply by 3.',
+    levels:{easy:'Years 3–4: naming shaded fractions, and unit fractions of amounts.',medium:'Year 5: shading equivalent fractions and comparing.',hard:'Year 6: fractions of amounts, and adding or subtracting fractions.'},
+    round(){
+      const kind=level==='easy'?pick(['name','unit']):level==='medium'?pick(['shade','shade','compare']):pick(['amount','add']);
+      if(kind==='name'){
+        let d,k;fresh('fn',()=>{d=pick([2,3,4,5,6,8,10]);k=rand(1,d-1);return d*100+k});
+        stage.innerHTML=`<div class="fbar">${Array.from({length:d},(_,i)=>`<span class="p${i<k?' on':''}"></span>`).join('')}</div>`;
+        setPrompt('What fraction of the bar is shaded?');
+        const wrong=[`${d-k}/${d}`,`${k}/${d+(d<10?1:-1)}`,`${k}/${d-k}`].filter(x=>x!==`${k}/${d}`&&!x.endsWith('/0'));
+        const opts=shuffle([`${k}/${d}`,...[...new Set(wrong)].slice(0,2)]).map(v=>{const[a,b]=v.split('/');return{label:fracWords(+a,+b),value:v,html:frac(a,b)}});
+        return askOpts(opts,`${k}/${d}`,()=>showFact(`${k} out of ${d} equal parts are shaded: ${frac(k,d)}`));
+      }
+      if(kind==='unit'){
+        let d,m;fresh('fu',()=>{d=pick([2,3,4,5,8,10]);m=rand(2,10);return d*100+m});
+        const amt=d*m;stage.innerHTML=`<div class="sum">${frac(1,d)} of ${amt} = <span class="q">?</span></div>`;
+        setPrompt(`What is one ${DEN[d][0]} of ${amt}?`);
+        return askNumber({answer:m,onRight:()=>{fillQ(m);showFact(`Split ${amt} into ${d} equal parts: ${amt} ÷ ${d} = ${m}.`)},onWrong:()=>{showHint(`One ${DEN[d][0]} means divide by ${d}.`);return null}});
+      }
+      if(kind==='shade'){
+        let a,b,m;fresh('fs',()=>{[a,b]=pick([[1,2],[1,3],[2,3],[1,4],[3,4],[2,5],[3,5]]);m=b*pick(b<=3?[2,3,4]:[2]);return a*100+b*10+m});
+        let on=new Set();
+        stage.innerHTML=`<div class="sum">${frac(a,b)} =</div><div class="fbar tap" id="fb">${Array.from({length:m},(_,i)=>`<span class="p" data-i="${i}"></span>`).join('')}</div><p class="cap" id="fcap" style="margin:0;color:var(--ink-soft)">Tap the parts to shade them. 0 of ${m} shaded.</p>`;
+        setPrompt(`Shade the bar to show the same amount as ${a}/${b}.`,`Shade the bar to show ${fracWords(a,b)}.`);
+        const fb=$('#fb');
+        fb.onclick=e=>{const p=e.target.closest('.p');if(!p||fb.dataset.done)return;const i=+p.dataset.i;on.has(i)?on.delete(i):on.add(i);p.classList.toggle('on');sfx.note(on.size);$('#fcap').textContent=`Tap the parts to shade them. ${on.size} of ${m} shaded.`};
+        clearAnswers();
+        const chk=document.createElement('button');chk.className='next';chk.style.background='var(--blue)';chk.style.boxShadow='0 7px 0 var(--blue-deep)';chk.textContent='Check';
+        chk.onclick=()=>{
+          if(on.size*b===a*m){fb.dataset.done=1;chk.remove();win(()=>showFact(`${frac(a,b)} = ${frac(on.size,m)}. They are equivalent fractions.`))}
+          else{sfx.oops();const h=`The bar has ${m} parts, so each ${DEN[b][0]} is ${m/b} parts. You need ${a*m/b}.`;showHint(h);say(h)}
+        };
+        return answers.appendChild(chk);
+      }
+      if(kind==='compare'){
+        let f1,f2;fresh('fc',()=>{const b=pick([2,3,4,5,6]),mul=pick([2,3].filter(x=>b*x<=12)),a1=rand(1,b-1),a2=rand(1,b*mul-1);f1=[a1,b];f2=[a2,b*mul];return f1+''+f2});
+        if(f1[0]*f2[1]===f2[0]*f1[1])f2[0]=f2[0]+1<f2[1]?f2[0]+1:f2[0]-1;
+        const big=f1[0]*f2[1]>f2[0]*f1[1]?f1:f2;
+        stage.innerHTML=`<div class="sum">${frac(...f1)} or ${frac(...f2)}</div>`;
+        setPrompt('Which fraction is bigger?',`Which is bigger, ${fracWords(...f1)} or ${fracWords(...f2)}?`);
+        const k=f2[1]/f1[1];
+        return askOpts([f1,f2].map(f=>({label:fracWords(...f),value:f.join('/'),html:frac(...f)})),big.join('/'),()=>showFact(`${frac(...f1)} = ${frac(f1[0]*k,f2[1])}, and ${f1[0]*k} ${f1[0]*k>f2[0]?'>':'<'} ${f2[0]}.`),()=>`Try changing ${fracWords(...f1)} into ${DEN[f2[1]][1]}.`);
+      }
+      if(kind==='amount'){
+        let a,b,m;fresh('fa',()=>{b=pick([3,4,5,6,8,10]);a=rand(2,b-1);m=rand(3,12);return a*1000+b*100+m});
+        const amt=b*m,ans=a*m;
+        stage.innerHTML=`<div class="sum">${frac(a,b)} of ${amt} = <span class="q">?</span></div>`;
+        setPrompt(`What is ${a}/${b} of ${amt}?`,`What is ${fracWords(a,b)} of ${amt}?`);
+        return askNumber({answer:ans,onRight:()=>{fillQ(ans);showFact(`${amt} ÷ ${b} = ${m}, then ${m} × ${a} = ${ans}.`)},onWrong:()=>{showHint(`First find one ${DEN[b][0]}: ${amt} ÷ ${b}.`);return null}});
+      }
+      let p;fresh('fadd',()=>{p=pick([[1,2,1,4],[1,3,1,6],[1,4,1,8],[2,5,1,10],[1,2,1,6],[3,4,1,8],[2,3,1,6],[1,2,3,10]]);return p.join()});
+      const [a1,b1,a2,b2]=p,op=Math.random()<.5?'+':'−',k=b2/b1;
+      let n=op==='+'?a1*k+a2:a1*k-a2,d=b2;
+      if(n<=0){return this.round()}
+      const g1=gcd(n,d),rn=n/g1,rd=d/g1;
+      const right=`${rn}/${rd}`,wrongs=[`${op==='+'?a1+a2:Math.abs(a1-a2)}/${op==='+'?b1+b2:Math.abs(b2-b1)||b2}`,`${op==='+'?n+1:n+1}/${d}`].filter(x=>x!==right&&!x.startsWith('0/'));
+      stage.innerHTML=`<div class="sum">${frac(a1,b1)} ${op} ${frac(a2,b2)} = <span class="q">?</span></div>`;
+      setPrompt(`Work out ${a1}/${b1} ${op} ${a2}/${b2}.`,`Work out ${fracWords(a1,b1)} ${op==='+'?'plus':'minus'} ${fracWords(a2,b2)}.`);
+      askOpts(shuffle([right,...[...new Set(wrongs)]]).map(v=>{const[x,y]=v.split('/');return{label:fracWords(+x,+y),value:v,html:frac(x,y)}}),right,
+        ()=>{fillQ(frac(rn,rd));showFact(`${frac(a1,b1)} = ${frac(a1*k,b2)}, so ${frac(a1*k,b2)} ${op} ${frac(a2,b2)} = ${frac(n,d)}${g1>1?` = ${frac(rn,rd)}`:''}`)},
+        o=>o.value===wrongs[0]?'Careful: never add or take away the bottom numbers. Make the denominators the same first.':null);
+    }
+  },
+  bars:{
+    title:'Bar Models',seal:'线段图',
+    tip:'A bar model turns a word problem into a picture. Parts sit end to end to make a whole, comparison bars show how much more one is, and in Year 6 "units" help with problems like "three times as many".',
+    levels:{easy:'Years 3–4: part-whole problems, adding and finding a missing part.',medium:'Year 5: comparison problems, more, fewer and the difference.',hard:'Year 6: units problems, times as many and sharing in a ratio.'},
+    round(){
+      const [A,B]=two(),thing=pick(THINGS);let story,bars,ans,way;
+      if(level==='easy'){
+        const x=rand(24,180),y=rand(18,160);
+        if(Math.random()<.5){story=`${A} has ${x} ${thing}. ${B} has ${y}. How many ${thing} do they have altogether?`;bars=barModel([{name:'',segs:[{v:x,t:x},{v:y,t:y,cls:'b'}]}],'? altogether');ans=x+y;way=`${x} + ${y} = ${x+y}`}
+        else{const t=x+y;story=`${A} and ${B} have ${t} ${thing} altogether. ${A} has ${x}. How many does ${B} have?`;bars=barModel([{name:'',segs:[{v:x,t:`${A} ${x}`},{v:y,t:'?',cls:'q'}]}],`${t} altogether`);ans=y;way=`${t} − ${x} = ${y}`}
+      }else if(level==='medium'){
+        const x=rand(120,600),d=rand(25,240),kind=pick(['more','fewer','diff']);
+        if(kind==='more'){story=`${A} has ${x} ${thing}. ${B} has ${d} more than ${A}. How many does ${B} have?`;bars=barModel([{name:A,segs:[{v:x,t:x}]},{name:B,segs:[{v:x,t:x,cls:'b'},{v:d,t:`${d} more`,cls:'d'}]}],`${B}: ?`);ans=x+d;way=`${x} + ${d} = ${x+d}`}
+        else if(kind==='fewer'){story=`${A} has ${x+d} ${thing}. ${B} has ${d} fewer than ${A}. How many does ${B} have?`;bars=barModel([{name:A,segs:[{v:x+d,t:x+d}]},{name:B,segs:[{v:x,t:'?',cls:'q'},{v:d,t:`${d} fewer`,cls:'d'}]}]);ans=x;way=`${x+d} − ${d} = ${x}`}
+        else{story=`${A} has ${x+d} ${thing} and ${B} has ${x}. How many more does ${A} have?`;bars=barModel([{name:A,segs:[{v:x,t:x},{v:d,t:'?',cls:'q'}]},{name:B,segs:[{v:x,t:x,cls:'b'}]}]);ans=d;way=`${x+d} − ${x} = ${d}`}
+      }else{
+        const u=rand(6,40),kind=pick(['times','times','ratio']);
+        if(kind==='times'){const k=rand(2,5),t=u*(k+1),askBig=Math.random()<.5;
+          story=`${A} has ${k} times as many ${thing} as ${B}. Together they have ${t}. How many does ${askBig?A:B} have?`;
+          bars=barModel([{name:A,segs:Array.from({length:k},()=>({v:1,t:askBig?'?':''}))},{name:B,segs:[{v:1,t:askBig?'':'?',cls:'b'}]}],`${t} altogether`);
+          ans=askBig?u*k:u;way=`${k+1} units = ${t}, so 1 unit = ${t} ÷ ${k+1} = ${u}${askBig?`, and ${A} has ${k} × ${u} = ${u*k}`:''}.`}
+        else{const [p,q]=pick([[2,3],[1,4],[3,5],[2,5],[3,4]]),t=u*(p+q);
+          story=`${A} and ${B} share ${t} ${thing} in the ratio ${p} : ${q}. How many does ${B} get?`;
+          bars=barModel([{name:A,segs:Array.from({length:p},()=>({v:1,t:''}))},{name:B,segs:Array.from({length:q},()=>({v:1,t:'?',cls:'b'}))}],`${t} altogether`);
+          ans=u*q;way=`${p+q} units = ${t}, so 1 unit = ${u}, and ${B} gets ${q} × ${u} = ${u*q}.`}
+      }
+      stage.innerHTML=`<p class="word">${story}</p>${bars}`;
+      setPrompt('Use the bar model to solve the problem.',story);
+      askNumber({answer:ans,onRight:()=>showFact(way),onWrong:(v,t)=>{if(t>=2)showHint(way.replace(/= [\d,]+(\.|$)/,'= ?$1'));return null}});
+    }
+  },
+  fdp:{
+    title:'Decimals and Percentages',seal:'百分数',
+    tip:'A hundred square has 100 equal parts. Each column is one tenth (0.1), each small square is one hundredth (0.01), and "per cent" means out of 100. To find 15% of 80, find 10% (8) and 5% (4), then add.',
+    levels:{easy:'Years 3–4: tenths and hundredths as decimals.',medium:'Year 5: percentages on a hundred square, and matching fractions to percentages.',hard:'Year 6: percentages of amounts, and comparing decimals, fractions and percentages.'},
+    round(){
+      if(level==='easy'){
+        const tenths=Math.random()<.5;let k;fresh('fdp-e',()=>{k=tenths?rand(1,9):rand(11,99);return k+(tenths?'t':'h')});
+        if(!tenths&&k%10===0)k++;
+        const right=tenths?(k/10).toFixed(1):(k/100).toFixed(2);
+        const wrongs=tenths?[(k/100).toFixed(2),String(k)]:[(k/10).toFixed(1),(k/1000).toFixed(3)];
+        stage.innerHTML=hundred(k,tenths);
+        setPrompt('What decimal of the hundred square is shaded?');
+        return askOpts(shuffle([right,...wrongs]).map(v=>({label:v})),right,()=>showFact(tenths?`${k} columns out of 10 are shaded: ${k} tenths = ${right}`:`${k} small squares out of 100 are shaded: ${k} hundredths = ${right}`));
+      }
+      if(level==='medium'){
+        if(Math.random()<.6){
+          let k;fresh('fdp-m',()=>{k=rand(5,95);return k});
+          stage.innerHTML=hundred(k,false);
+          setPrompt('What percentage of the hundred square is shaded?');
+          return askNumber({answer:k,unit:'%',onRight:()=>showFact(`${k} out of 100 squares: ${k}% = ${(k/100).toFixed(2)}`),onWrong:()=>{showHint('Count the full rows of 10 first, then the extra squares.');return null}});
+        }
+        const M=[[1,2,50],[1,4,25],[3,4,75],[1,10,10],[1,5,20],[2,5,40],[3,10,30],[7,10,70]],m=pick(M);
+        stage.innerHTML=`<div class="sum">${frac(m[0],m[1])} = <span class="q">?</span> %</div>`;
+        setPrompt(`Write ${m[0]}/${m[1]} as a percentage.`,`Write ${fracWords(m[0],m[1])} as a percentage.`);
+        return askNumber({answer:m[2],unit:'%',onRight:()=>{fillQ(m[2]);showFact(`${frac(m[0],m[1])} = ${frac(m[2],100)} = ${m[2]}%`)},onWrong:()=>{showHint(`Make the bottom number 100: × ${100/m[1]}.`);return null}});
+      }
+      if(Math.random()<.65){
+        let p,amt;fresh('fdp-h',()=>{p=pick([10,20,25,50,5,15,75,30]);amt=pick(p%25===0?[40,60,80,120,200,360]:[20,40,60,80,120,240,300]);return p*1000+amt});
+        const ans=p*amt/100,ten=amt/10;
+        const way=p===25?`25% is a quarter: ${amt} ÷ 4 = ${ans}`:p===50?`50% is a half: ${amt} ÷ 2 = ${ans}`:p===75?`75% is three quarters: ${amt} ÷ 4 × 3 = ${ans}`:p===5?`10% is ${ten}, so 5% is half of that: ${ans}`:p===15?`10% is ${ten} and 5% is ${ten/2}, so 15% is ${ans}`:`10% is ${ten}, so ${p}% is ${ten} × ${p/10} = ${ans}`;
+        stage.innerHTML=`<div class="sum">${p}% of ${amt} = <span class="q">?</span></div>`;
+        setPrompt(`What is ${p}% of ${amt}?`);
+        return askNumber({answer:ans,decimal:true,onRight:()=>{fillQ(fmt(ans));showFact(way)},onWrong:()=>{showHint(`Start by finding 10%: ${amt} ÷ 10 = ${ten}.`);return null}});
+      }
+      const sets=[[['0.4','0.4'],['3/8','0.375'],['45%','0.45']],[['0.7','0.7'],['3/4','0.75'],['72%','0.72']],[['0.35','0.35'],['1/3','0.333'],['30%','0.3']],[['0.6','0.6'],['5/8','0.625'],['58%','0.58']],[['0.25','0.25'],['1/5','0.2'],['22%','0.22']]];
+      const s=pick(sets),big=s.reduce((m,x)=>+x[1]>+m[1]?x:m);
+      stage.innerHTML='<div class="sum">Which is biggest?</div>';
+      setPrompt('Which of these is the biggest amount?');
+      askOpts(shuffle(s.map(x=>({label:x[0],value:x[0],html:x[0].includes('/')?frac(...x[0].split('/')):x[0]}))),big[0],()=>showFact(s.map(x=>`${x[0]} = ${x[1]}`).join(', ')+'. Changing them all to decimals makes them easy to compare.'),()=>'Try changing them all into decimals.');
+    }
+  },
+  area:{
+    title:'Area and Perimeter',seal:'面积',
+    tip:'Perimeter is the distance all the way round the edge. Area is the space inside, measured in squares. For a rectangle, area is length × width. An L-shape can be split into two rectangles.',
+    levels:{easy:'Years 3–4: perimeter of rectangles on a grid of 1 cm squares.',medium:'Year 5: area and perimeter of rectangles from their side lengths.',hard:'Year 6: area and perimeter of L-shapes.'},
+    round(){
+      let W,H;fresh('area',()=>{W=rand(level==='hard'?6:3,level==='easy'?8:11);H=rand(level==='hard'?4:2,level==='easy'?5:7);return W*100+H});
+      if(level==='hard'){
+        /* The cut-out corner is at least 2 cm each way so its labels don't collide */
+        const cw=rand(2,W-3),ch=rand(2,H-2),askArea=Math.random()<.6,s=Math.min(24,270/W),ox=46,oy=14;
+        const X=v=>ox+v*s,Y=v=>oy+v*s;
+        const pts=[[0,0],[W-cw,0],[W-cw,ch],[W,ch],[W,H],[0,H]].map(([x,y])=>`${X(x)},${Y(y)}`).join(' ');
+        const lbl=(x,y,t,anchor)=>`<text x="${x}" y="${y}" text-anchor="${anchor||'middle'}">${t}</text>`;
+        stage.innerHTML=`<svg class="shape" viewBox="0 0 ${X(W)+52} ${Y(H)+34}" role="img" aria-label="An L-shape"><polygon points="${pts}" fill="var(--jade-soft)" stroke="var(--jade-deep)" stroke-width="4" stroke-linejoin="round"/>
+          ${lbl(X(W/2),Y(H)+24,W+' cm')}${lbl(ox-6,Y(H/2)+5,H+' cm','end')}${lbl(X((W-cw)/2),Y(0)+20,(W-cw)+' cm')}${lbl(X(W)+6,Y((H+ch)/2)+5,(H-ch)+' cm','start')}${lbl(X(W-cw/2),Y(ch)-6,cw+' cm')}${lbl(X(W-cw)+6,Y(ch/2)+5,ch+' cm','start')}</svg>`;
+        const A=(W-cw)*H+cw*(H-ch),P=2*(W+H);
+        setPrompt(askArea?'What is the area of this L-shape?':'What is the perimeter of this L-shape?');
+        return askNumber({answer:askArea?A:P,unit:askArea?'cm²':'cm',onRight:()=>showFact(askArea?`Split it into two rectangles: ${W-cw} × ${H} = ${(W-cw)*H} and ${cw} × ${H-ch} = ${cw*(H-ch)}. Total: ${A} cm²`:`Add all six sides: ${W} + ${H} + ${W-cw} + ${ch} + ${cw} + ${H-ch} = ${P} cm. It's the same as the full rectangle around it!`),
+          onWrong:()=>{showHint(askArea?'Split the L into two rectangles, then add their areas.':'Add up all six sides. Check the labels for each one.');return null}});
+      }
+      const s=Math.min(28,290/W),askArea=level==='medium'&&Math.random()<.55,grid=level==='easy';
+      const lines=grid?[...Array(W+1).keys()].map(i=>`<line x1="${20+i*s}" y1="14" x2="${20+i*s}" y2="${14+H*s}" stroke="var(--jade-deep)" stroke-width="1.2" opacity=".5"/>`).join('')+[...Array(H+1).keys()].map(j=>`<line x1="20" y1="${14+j*s}" x2="${20+W*s}" y2="${14+j*s}" stroke="var(--jade-deep)" stroke-width="1.2" opacity=".5"/>`).join(''):'';
+      stage.innerHTML=`<svg class="shape" viewBox="0 0 ${40+W*s+40} ${H*s+50}" role="img" aria-label="A rectangle"><rect x="20" y="14" width="${W*s}" height="${H*s}" fill="var(--jade-soft)" stroke="var(--jade-deep)" stroke-width="4" rx="3"/>${lines}
+        ${grid?'':`<text x="${20+W*s/2}" y="${H*s+38}" text-anchor="middle">${W} cm</text><text x="${20+W*s+8}" y="${14+H*s/2+5}">${H} cm</text>`}</svg>${grid?'<p class="cap" style="margin:0;color:var(--ink-soft)">Each square is 1 cm wide.</p>':''}`;
+      setPrompt(askArea?'What is the area of this rectangle?':'What is the perimeter of this rectangle?');
+      askNumber({answer:askArea?W*H:2*(W+H),unit:askArea?'cm²':'cm',onRight:()=>showFact(askArea?`Area = ${W} × ${H} = ${W*H} cm²`:`Perimeter = ${W} + ${H} + ${W} + ${H} = ${2*(W+H)} cm`),
+        onWrong:()=>{showHint(askArea?'Area is length × width.':'Go all the way round: add all four sides.');return null}});
+    }
+  }
+};
+
+/* ---------- navigation ---------- */
+const home=$('#home'),game=$('#game'),homeBtn=$('#homeBtn');
+function play(){stopTimers();current.round()}
+function setTip(){$('#gTip').textContent=current.tip+' '+current.levels[level]}
+document.querySelectorAll('.tile').forEach(t=>t.onclick=()=>{
+  sfx.click();current=GAMES[t.dataset.game];
+  $('#gSeal').textContent=current.seal;$('#gSeal').style.setProperty('--c',getComputedStyle(t).getPropertyValue('--c'));
+  $('#gTitle').textContent=current.title;setTip();
+  document.body.classList.add('in-game');home.hidden=true;game.hidden=false;homeBtn.hidden=false;window.scrollTo(0,0);
+  play();
+});
+homeBtn.onclick=()=>{sfx.click();stopTimers();keyHandler=null;try{speechSynthesis.cancel()}catch(e){}game.hidden=true;home.hidden=false;homeBtn.hidden=true;document.body.classList.remove('in-game');window.scrollTo(0,0)};
+$('#pandaBtn').onclick=e=>{const b=e.currentTarget;b.classList.remove('wiggle');void b.offsetWidth;b.classList.add('wiggle');sfx.yay();say(stars?`Hi, it's Bao! You have ${pl(stars,'star')}. Pick a game!`:"Hi, it's Bao! Ready for some Key Stage 2 maths? Pick a game!",true)};
+
+/* ---------- year group ---------- */
+function showLevel(){document.querySelectorAll('.lv').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.level===level)))}
+showLevel();
+document.querySelectorAll('.lv').forEach(b=>b.onclick=()=>{
+  if(b.dataset.level===level)return;
+  level=b.dataset.level;
+  try{localStorage.setItem('bpm-level',level)}catch(e){}
+  showLevel();sfx.click();
+  if(!game.hidden){setTip();play()}
+});
+
+/* ---------- read aloud setting ---------- */
+function showRead(){document.querySelectorAll('#readChips .chip-btn').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.read==='on')===readAloud)))}
+showRead();
+document.querySelectorAll('#readChips .chip-btn').forEach(b=>b.onclick=()=>{
+  readAloud=b.dataset.read==='on';try{localStorage.setItem('bpm-read',readAloud?'on':'off')}catch(e){}
+  showRead();sfx.click();if(readAloud)say('Questions will be read aloud.');
+});
+
+/* ---------- cheer + confetti ---------- */
+function showCheer(){
+  if(!$('#timesUp').hidden)return;
+  $('#cheerText').textContent=`${stars} stars! Bao is very impressed.`;
+  $('#cheer').hidden=false;burst(160);say(`Brilliant! You have ${stars} stars!`);
+}
+$('#cheerBtn').onclick=()=>{sfx.click();$('#cheer').hidden=true};
+
+const cv=$('#confetti'),cx=cv.getContext('2d');let parts=[],running=false;
+const reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+function palette(){const s=getComputedStyle(document.documentElement);return['--red','--gold','--jade','--blue','--plum','--cheek'].map(v=>s.getPropertyValue(v).trim())}
+function burst(n){
+  if(reduce)return;
+  const dpr=window.devicePixelRatio||1;cv.width=innerWidth*dpr;cv.height=innerHeight*dpr;cx.setTransform(dpr,0,0,dpr,0,0);
+  const cols=palette();
+  for(let i=0;i<n;i++)parts.push({x:innerWidth/2+(Math.random()-.5)*80,y:innerHeight*.45,vx:(Math.random()-.5)*14,vy:-Math.random()*14-4,r:5+Math.random()*5,c:cols[i%cols.length],rot:Math.random()*6,vr:(Math.random()-.5)*.4,life:0,round:Math.random()<.4});
+  if(!running){running=true;requestAnimationFrame(tick)}
+}
+function tick(){
+  cx.clearRect(0,0,innerWidth,innerHeight);
+  parts=parts.filter(p=>p.life<120&&p.y<innerHeight+30);
+  parts.forEach(p=>{p.life++;p.vy+=.38;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;cx.save();cx.translate(p.x,p.y);cx.rotate(p.rot);cx.fillStyle=p.c;if(p.round){cx.beginPath();cx.arc(0,0,p.r/2,0,7);cx.fill()}else cx.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);cx.restore()});
+  if(parts.length)requestAnimationFrame(tick);else{running=false;cx.clearRect(0,0,innerWidth,innerHeight)}
+}
+
+/* ---------- reset stars ---------- */
+const resetRow=$('#resetRow'),confirmRow=$('#confirmRow');
+$('#resetBtn').onclick=()=>{sfx.click();$('#confirmText').textContent=`Reset all ${pl(stars,'star')} to 0?`;resetRow.hidden=true;confirmRow.hidden=false};
+$('#resetNo').onclick=()=>{sfx.click();confirmRow.hidden=true;resetRow.hidden=false};
+$('#resetYes').onclick=()=>{
+  stars=0;try{localStorage.setItem('bpm-stars','0')}catch(e){}
+  if(timer.end){timer.base=0;saveTimer()}
+  showStars();sfx.click();confirmRow.hidden=true;resetRow.hidden=false;
+};
+showStars();
+
+/* ---------- play timer ---------- */
+/* The end time is saved, so reloading the page doesn't restart the countdown */
+const timerPill=$('#timerPill'),timerText=$('#timerText'),timesUpBox=$('#timesUp');
+let timer={end:0,base:0,min:0,warned:false},ticker=null,lastBase=0;
+try{const t=JSON.parse(localStorage.getItem('bpm-timer')||'null');if(t&&t.end>Date.now())timer=t}catch(e){}
+function saveTimer(){try{if(timer.end)localStorage.setItem('bpm-timer',JSON.stringify(timer));else localStorage.removeItem('bpm-timer')}catch(e){}}
+const clock=ms=>{const s=Math.max(0,Math.ceil(ms/1000));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+function setTimer(min,base){
+  timer=min?{end:Date.now()+min*60000,base:base??stars,min,warned:false}:{end:0,base:0,min:0,warned:false};
+  saveTimer();renderTimer();
+}
+function renderTimer(){
+  const on=timer.end>0;
+  timerPill.hidden=!on;document.body.classList.toggle('timing',on);
+  document.querySelectorAll('#timerChips .chip-btn').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.min===(on?timer.min:0))));
+  $('#timerStatus').hidden=!on;
+  clearInterval(ticker);
+  if(on){updateTimer();ticker=setInterval(updateTimer,1000)}
+}
+function updateTimer(){
+  const left=timer.end-Date.now();
+  timerText.textContent=clock(left);
+  timerPill.setAttribute('aria-label',`Play time left: ${clock(left)}`);
+  $('#timerStatus').textContent=`${clock(left)} left. Play ends at ${new Date(timer.end).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})}.`;
+  timerPill.classList.toggle('low',left<=60000);
+  if(left>0&&left<=60000&&!timer.warned){timer.warned=true;saveTimer();say('One minute left!',true)}
+  if(left<=0)timesUp();
+}
+function timesUp(){
+  const earned=Math.max(0,stars-timer.base);
+  lastBase=timer.base;setTimer(0);stopTimers();keyHandler=null;
+  $('#tuText').textContent=earned?`You earned ${pl(earned,'star')} this session. Great work!`:'Great practising today!';
+  $('#cheer').hidden=true;timesUpBox.hidden=false;burst(120);
+  say(`Time's up! ${earned?`You earned ${pl(earned,'star')}. `:''}Well done!`,true);
+}
+document.querySelectorAll('#timerChips .chip-btn').forEach(b=>b.onclick=()=>{
+  const min=+b.dataset.min;sfx.click();setTimer(min);
+});
+$('#tuDone').onclick=()=>{sfx.click();timesUpBox.hidden=true;if(!game.hidden)homeBtn.click()};
+/* Holding for 2 seconds keeps a quick tap from adding time */
+const more=$('#tuMore');let holdT=null;
+more.addEventListener('pointerdown',e=>{
+  e.preventDefault();more.classList.add('holding');
+  holdT=setTimeout(()=>{more.classList.remove('holding');timesUpBox.hidden=true;setTimer(5,lastBase);sfx.yay()},2000);
+});
+['pointerup','pointerleave','pointercancel'].forEach(ev=>more.addEventListener(ev,()=>{clearTimeout(holdT);more.classList.remove('holding')}));
+more.addEventListener('contextmenu',e=>e.preventDefault());
+renderTimer();
+})();
+</script>
+</body>
+</html>
