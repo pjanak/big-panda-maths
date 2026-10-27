@@ -45,4 +45,6 @@ Open **Grown-up settings** at the bottom of the home screen:
 
 ## Running it
 
+Live at **https://big-panda-maths.pages.dev** (Cloudflare Pages, redeploys on every push to `main`).
+
 It's a single static file with no build step. Open `index.html` in a browser, or host the folder on any static host (GitHub Pages, Cloudflare Pages, Netlify). A physical keyboard works too: type digits, Backspace and Enter.
